@@ -22,5 +22,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.mcxiaoke.volley:library:1.0.19'
+    compile 'com.alibaba:fastjson:1.1.67.android'
+
     implementation 'com.android.support:appcompat-v7:26.1.0'
 }

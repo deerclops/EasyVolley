@@ -3,9 +3,8 @@ package com.terrence.easyvolley.net;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
-import com.android.volley.Response.ErrorListener;
+import com.terrence.easyvolley.net.callback.RequestCallbacks;
 
 import java.io.UnsupportedEncodingException;
 
@@ -15,8 +14,11 @@ import java.io.UnsupportedEncodingException;
 
 public class RopStringRequest extends Request<String> {
 
-    public RopStringRequest(String url, ErrorListener errorListener) {
-        super(Method.POST, url, errorListener);
+    private final RequestCallbacks CALLBACKS;
+
+    public RopStringRequest(String url, RequestCallbacks callbacks) {
+        super(Method.POST, url, callbacks);
+        CALLBACKS = callbacks;
     }
 
     @Override
@@ -32,16 +34,7 @@ public class RopStringRequest extends Request<String> {
 
     @Override
     protected void deliverResponse(String response) {
-
-    }
-
-
-    private ErrorListener createErrorListener() {
-        return new ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        };
+        if (CALLBACKS != null)
+            CALLBACKS.onResponse(response);
     }
 }

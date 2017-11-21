@@ -1,10 +1,13 @@
 package com.terrence.easyvolley.net.callback;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
 /**
  * Created by DarkSouls on 2017/11/20.
  */
 
-public class RequestCallbacks {
+public class RequestCallbacks implements Response.ErrorListener {
 
     private final ISuccess SUCCESS;
     private final IFailure FAILURE;
@@ -18,7 +21,13 @@ public class RequestCallbacks {
         this.REQUEST = request;
     }
 
-    public void onResponse(String response){
+    public void onResponse(String response) {
 
+    }
+
+    @Override
+    public void onErrorResponse(VolleyError error) {
+        if (ERROR != null)
+            ERROR.onError();
     }
 }
