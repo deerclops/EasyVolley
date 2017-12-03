@@ -5,5 +5,5 @@ package com.terrence.easyvolley.net.callback;
  */
 
 public interface IFailure {
-    void onFailure();
+    void onFailure(String msg);
 }
