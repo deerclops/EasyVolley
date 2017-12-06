@@ -5,5 +5,5 @@ package com.terrence.easyvolley.net.callback;
  */
 
 public interface IToastError {
-    void onToastError();
+    void onToastError(String errorMsg);
 }

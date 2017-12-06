@@ -5,6 +5,9 @@ import com.android.volley.VolleyError;
 import com.terrence.easyvolley.net.entity.RopResult;
 import com.terrence.easyvolley.net.util.VolleyErrorHelper;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by DarkSouls on 2017/11/20.
  */
@@ -14,14 +17,14 @@ public class RequestCallbacks implements Response.Listener<RopResult>, Response.
     private final ISuccess SUCCESS;
     private final ISessionExpired SESSION_EXPIRED;
     private final IToastError TOAST_ERROR;
-    private final IHandleServerError HANDLE_SERVER_ERROR;
+    private final HashMap<String, IHandleServerError> HANDLE_SERVER_ERROR;
     private final IFailure FAILURE;
 
     public RequestCallbacks(IRequest request,
                             ISuccess success,
                             ISessionExpired sessionExpired,
                             IToastError toastError,
-                            IHandleServerError handleServerError,
+                            HashMap<String, IHandleServerError> handleServerError,
                             IFailure failure) {
         this.REQUEST = request;
         this.SUCCESS = success;
@@ -34,17 +37,23 @@ public class RequestCallbacks implements Response.Listener<RopResult>, Response.
     @Override
     public void onResponse(RopResult result) {
         if (result.isSuccess()) {
-            if (SUCCESS!=null)
-                SUCCESS.onSuccess();
-            // FIXME: 2017/12/2
+            if (SUCCESS != null)
+                SUCCESS.onSuccess(result);
         } else if (result.isValidateSession()) {
-            if(SESSION_EXPIRED!=null)
+            if (SESSION_EXPIRED != null)
                 SESSION_EXPIRED.onSessionExpired();
         } else if (result.needToast()) {
-            if(TOAST_ERROR!=null)
-                TOAST_ERROR.onToastError();
+            if (TOAST_ERROR != null)
+                TOAST_ERROR.onToastError(result.getErrorMsg());
         } else {
-//            if()
+            if (HANDLE_SERVER_ERROR != null && HANDLE_SERVER_ERROR.size() > 0) {
+                for (Map.Entry<String, IHandleServerError> entry : HANDLE_SERVER_ERROR.entrySet()) {
+                    if (entry.getKey().equals(result.getSubErrorCode())) {
+                        entry.getValue().onHandleServerError();
+                        break;
+                    }
+                }
+            }
         }
         if (REQUEST != null)
             REQUEST.onRequestEnd();
@@ -58,4 +67,7 @@ public class RequestCallbacks implements Response.Listener<RopResult>, Response.
             REQUEST.onRequestEnd();
     }
 
+    public ISuccess getSuccessListener() {
+        return SUCCESS;
+    }
 }
