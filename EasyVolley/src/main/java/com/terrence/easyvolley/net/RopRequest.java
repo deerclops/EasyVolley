@@ -1,11 +1,16 @@
 package com.terrence.easyvolley.net;
 
+import android.support.annotation.NonNull;
+import android.util.Log;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.terrence.easyvolley.net.callback.ISuccess;
+import com.terrence.easyvolley.net.callback.RequestCallbacks;
 import com.terrence.easyvolley.net.entity.RopResult;
 import com.terrence.easyvolley.net.util.JsonParseHelper;
 
@@ -18,13 +23,23 @@ import java.util.Map;
 public class RopRequest extends Request<RopResult> {
 
     private Class mClazz;
+
     private Response.Listener<RopResult> mSuccessListener;
 
     private Map<String, String> mReqParamsMap;
     private Map<String, String> mHeadParamsMap;
-//    private Object mParamObj;//请求包含在一个对象内
 
-    public <T extends RopResult> RopRequest(int method, String url, Class<T> clazz,
+    RopRequest(int method, String url, @NonNull RequestCallbacks callbacks) {
+        super(method, url, callbacks);
+        this.mSuccessListener = callbacks;
+        ISuccess successListener = callbacks.getSuccessListener();
+        if (successListener != null) {
+            this.mClazz = successListener.getResponseClass();
+        }
+    }
+
+    @Deprecated
+    public RopRequest(int method, String url, Class clazz,
                       Response.Listener<RopResult> successListener,
                       Response.ErrorListener errorListener) {
         super(method, url, errorListener);
@@ -62,6 +77,7 @@ public class RopRequest extends Request<RopResult> {
         } catch (UnsupportedEncodingException e) {
             jsonStr = new String(response.data);
         }
+        Log.d(this.getClass().getName(), jsonStr);
         RopResult jsonObject = null;
         try {
             jsonObject = (RopResult) JsonParseHelper.parseJsonObject(jsonStr, mClazz);
