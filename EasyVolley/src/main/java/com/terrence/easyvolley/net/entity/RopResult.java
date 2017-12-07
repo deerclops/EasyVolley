@@ -8,10 +8,10 @@ import java.util.List;
 
 public class RopResult {
 
-    private int code;
-    private String message;
-    private String solution;
-    private List<ResultDetail> subErrors;
+    public int code;
+    public String message;
+    public String solution;
+    public List<SubError> subErrors;
 
     public boolean isSuccess() {
         return code == 0 && message == null && solution == null;
