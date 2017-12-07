@@ -1,6 +1,7 @@
 package com.terrence.easyvolley.net;
 
 import com.android.volley.Request;
+import com.terrence.easyvolley.app.Rop;
 import com.terrence.easyvolley.net.callback.IFailure;
 import com.terrence.easyvolley.net.callback.IHandleServerError;
 import com.terrence.easyvolley.net.callback.IRequest;
@@ -9,6 +10,9 @@ import com.terrence.easyvolley.net.callback.ISuccess;
 import com.terrence.easyvolley.net.callback.IToastError;
 import com.terrence.easyvolley.net.callback.RequestCallbacks;
 import com.terrence.easyvolley.net.entity.RopResult;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by DarkSouls on 2017/12/1.
@@ -24,45 +28,52 @@ public final class NetEngine {
     private final ISuccess SUCCESS;
     private final ISessionExpired SESSION_EXPIRED;
     private final IToastError TOAST_ERROR;
-    private final IHandleServerError HANDLE_SERVER_ERROR;
+    private final HashMap<String, IHandleServerError> HANDLE_SERVER_ERROR;
     private final IFailure FAILURE;
 
     private RequestCallbacks mReqCallBacks;
 
-    NetEngine(String URL,
-                     String METHOD_NAME, String METHOD_VERSION,
-                     IRequest REQUEST,
-                     ISuccess SUCCESS,
-                     ISessionExpired SESSION_EXPIRED,
-                     IToastError TOAST_ERROR,
-                     IHandleServerError HANDLE_SERVER_ERROR,
-                     IFailure FAILURE) {
-        this.URL = URL;
-        this.METHOD_NAME = METHOD_NAME;
-        this.METHOD_VERSION = METHOD_VERSION;
-        this.REQUEST = REQUEST;
-        this.SUCCESS = SUCCESS;
-        this.SESSION_EXPIRED = SESSION_EXPIRED;
-        this.TOAST_ERROR = TOAST_ERROR;
-        this.HANDLE_SERVER_ERROR = HANDLE_SERVER_ERROR;
-        this.FAILURE = FAILURE;
+    // Params
+    private final Map<String, String> HEAD_PARAMS;
+    private final Map<String, String> BODY_PARAMS;
+
+    NetEngine(String url,
+              String method_name, String method_version,
+              IRequest request,
+              ISuccess success,
+              ISessionExpired session_expired,
+              IToastError toast_error,
+              HashMap<String, IHandleServerError> handle_server_error,
+              IFailure failure,
+              Map<String, String> headParams,
+              Map<String, String> bodyParams) {
+        this.URL = url;
+        this.METHOD_NAME = method_name;
+        this.METHOD_VERSION = method_version;
+        this.REQUEST = request;
+        this.SUCCESS = success;
+        this.SESSION_EXPIRED = session_expired;
+        this.TOAST_ERROR = toast_error;
+        this.HANDLE_SERVER_ERROR = handle_server_error;
+        this.FAILURE = failure;
+
+        this.HEAD_PARAMS = headParams;
+        this.BODY_PARAMS = bodyParams;
+
+        mReqCallBacks = new RequestCallbacks(REQUEST, SUCCESS, SESSION_EXPIRED, TOAST_ERROR, HANDLE_SERVER_ERROR, FAILURE);
     }
 
     public static NetEngineBuilder builder() {
         return new NetEngineBuilder();
     }
 
-    private RequestCallbacks getReqCallBacks() {
-        if (mReqCallBacks == null) {
-            mReqCallBacks = new RequestCallbacks(REQUEST, SUCCESS, SESSION_EXPIRED, TOAST_ERROR, HANDLE_SERVER_ERROR, FAILURE);
+    public final void fetch() {
+        if (REQUEST != null) {
+            REQUEST.onRequestBegin();
         }
-        return mReqCallBacks;
-    }
-
-    public final <T extends RopResult> void fetch(Class<T> clazz) {
-        RopRequest req = new RopRequest(Request.Method.POST, URL, clazz, mReqCallBacks, mReqCallBacks);
-//        req.setHeadParamsMap();
-//        req.setReqParamsMap();
-
+        RopRequest req = new RopRequest(Request.Method.POST, URL, mReqCallBacks);
+        req.setHeadParamsMap(HEAD_PARAMS);
+        req.setReqParamsMap(BODY_PARAMS);
+        Rop.getRequestQueue().add(req);
     }
 }
