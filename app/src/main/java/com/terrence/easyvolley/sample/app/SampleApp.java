@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.terrence.easyvolley.app.Rop;
 
 /**
  * Created by DarkSouls on 2017/11/21.
@@ -11,17 +12,15 @@ import com.android.volley.toolbox.Volley;
 
 public class SampleApp extends Application {
 
-    private RequestQueue queue;
-
-    public RequestQueue getQueue(){
-        return this.queue;
-    }
-
     @Override
     public void onCreate() {
         super.onCreate();
 
-        queue = Volley.newRequestQueue(getApplicationContext());
-        queue.start();
+        Rop.init(this, "d5d907738f444eccb9e26c1e9f9bf295", "100094", new Rop.ISessionProvider() {
+            @Override
+            public String getSession() {
+                return "";
+            }
+        });
     }
 }
