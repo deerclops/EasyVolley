@@ -37,6 +37,8 @@ public final class NetEngineBuilder {
     private Map<String, String> mBodyParamsEncrypted = new HashMap<>();
     private Map<String, String> mBodyParamsNotEncrypted = new HashMap<>();
 
+    private boolean needSession = true;
+
     NetEngineBuilder() {
     }
 
@@ -118,15 +120,23 @@ public final class NetEngineBuilder {
         return this;
     }
 
+    public NetEngineBuilder noSession() {
+        this.needSession = false;
+        return this;
+    }
+
     public final NetEngine build() {
         encryptParams();
         mBodyParamsEncrypted.putAll(mBodyParamsNotEncrypted);
         return new NetEngine(mUrl, mMethodName, mMethodVersion,
                 mRequest, mSuccess, mSessionExpired, mToastError, mHandleServerError, mFailure,
-                mHeadParams, mBodyParamsEncrypted);
+                mHeadParams, mBodyParamsEncrypted, needSession);
     }
 
     private void encryptParams() {
+        if (needSession) {
+            mBodyParamsEncrypted.put("session", Rop.getSession());
+        }
         mBodyParamsEncrypted.put("appcode", Rop.getAppCode());
         mBodyParamsEncrypted.put("method", mMethodName);
         mBodyParamsEncrypted.put("v", mMethodVersion);

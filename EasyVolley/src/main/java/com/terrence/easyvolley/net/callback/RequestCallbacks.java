@@ -20,18 +20,22 @@ public class RequestCallbacks implements Response.Listener<RopResult>, Response.
     private final HashMap<String, IHandleServerError> HANDLE_SERVER_ERROR;
     private final IFailure FAILURE;
 
+    private final boolean NEED_SESSION;
+
     public RequestCallbacks(IRequest request,
                             ISuccess success,
                             ISessionExpired sessionExpired,
                             IToastError toastError,
                             HashMap<String, IHandleServerError> handleServerError,
-                            IFailure failure) {
+                            IFailure failure,
+                            boolean needSession) {
         this.REQUEST = request;
         this.SUCCESS = success;
         this.SESSION_EXPIRED = sessionExpired;
         this.TOAST_ERROR = toastError;
         this.HANDLE_SERVER_ERROR = handleServerError;
         this.FAILURE = failure;
+        this.NEED_SESSION = needSession;
     }
 
     @Override
@@ -39,7 +43,7 @@ public class RequestCallbacks implements Response.Listener<RopResult>, Response.
         if (result.isSuccess()) {
             if (SUCCESS != null)
                 SUCCESS.onSuccess(result);
-        } else if (result.isValidateSession()) {
+        } else if (NEED_SESSION && result.isValidateSession()) {
             if (SESSION_EXPIRED != null)
                 SESSION_EXPIRED.onSessionExpired();
         } else if (result.needToast()) {
