@@ -31,6 +31,8 @@ public final class NetEngine {
     private final HashMap<String, IHandleServerError> HANDLE_SERVER_ERROR;
     private final IFailure FAILURE;
 
+    private final boolean NEED_SESSION;
+
     private RequestCallbacks mReqCallBacks;
 
     // Params
@@ -46,7 +48,8 @@ public final class NetEngine {
               HashMap<String, IHandleServerError> handle_server_error,
               IFailure failure,
               Map<String, String> headParams,
-              Map<String, String> bodyParams) {
+              Map<String, String> bodyParams,
+              boolean needSession) {
         this.URL = url;
         this.METHOD_NAME = method_name;
         this.METHOD_VERSION = method_version;
@@ -60,7 +63,9 @@ public final class NetEngine {
         this.HEAD_PARAMS = headParams;
         this.BODY_PARAMS = bodyParams;
 
-        mReqCallBacks = new RequestCallbacks(REQUEST, SUCCESS, SESSION_EXPIRED, TOAST_ERROR, HANDLE_SERVER_ERROR, FAILURE);
+        this.NEED_SESSION = needSession;
+
+        mReqCallBacks = new RequestCallbacks(REQUEST, SUCCESS, SESSION_EXPIRED, TOAST_ERROR, HANDLE_SERVER_ERROR, FAILURE, NEED_SESSION);
     }
 
     public static NetEngineBuilder builder() {
