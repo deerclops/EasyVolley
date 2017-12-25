@@ -23,6 +23,7 @@ dependencies {
 
 <h2>使用</h2>
 在引入了依赖的module的Application内，于onCreate()方法内进行初始化。
+
 ````
 @Override
 public void onCreate() {
